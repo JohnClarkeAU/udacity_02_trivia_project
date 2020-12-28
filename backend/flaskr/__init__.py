@@ -45,7 +45,7 @@ def create_app(test_config=None):
     @app.route('/')
     def index():
         """ Home page of the API """
-        ret = "Hello"
+        ret = "Hello\r\n"
 
         # ### Uncomment for debugging ###
         # list_of_routes = list_routes(app)
@@ -76,7 +76,7 @@ def create_app(test_config=None):
         '''
         categories = Category.query.all()
         if len(categories) == 0:
-            abort(404)
+            abort(404, description="There are no categories available.")
         formatted_categories = {category.id: category.type for category in categories}
         return jsonify({
             'success': True,

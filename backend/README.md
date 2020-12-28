@@ -91,6 +91,8 @@ Setting the `FLASK_ENV` variable to `development` will detect file changes and r
 
 Setting the `FLASK_APP` variable to `flaskr` directs flask to use the `flaskr` directory and the `__init__.py` file to find the application. 
 
+The application is run on http://127.0.0.1:5000/ by default and is a proxy in the frontend configuration. 
+
 ## Features
 
 Within the backend API each endpoint defines the endpoint and response data. 
@@ -132,6 +134,15 @@ NOTE:
 `dropdb trivia_test` is used to remove any database that has been used in a previous test.
 
 # API Reference
+To use the API endpoints you must first run the server using the following commands:
+```bash
+export FLASK_APP=flaskr
+export FLASK_ENV=development
+flask run
+```
+
+## Base URL
+At present this app can only be run locally and is not hosted as a base URL. The backend app is hosted at the default, http://127.0.0.1:5000/, which is set as a proxy in the frontend configuration. 
 
 ## Endpoints
 
@@ -151,19 +162,137 @@ POST   '/quizzes'
 ### GET '/'
 Accesses the home page of the backend which just displays "Hello"
 
-curl
+#### curl
 ```bash
 curl http://127.0.0.1:5000/
 ```
-output
-```bash
+#### response
+```
 Hello
 ```
+#### errors
+```
+none
+```
+
+### GET '/categories'
+Retrieve all categories
+
+#### curl
+```bash
+curl http://127.0.0.1:5000/categories
+```
+#### response
+```javascript
+{
+  "success": true
+  "categories": {     
+    "1": "Science",   
+    "2": "Art",       
+    "3": "Geography", 
+    "4": "History",
+    "5": "Entertainment",
+    "6": "Sports"
+  },
+}
+```
+#### errors
+```javascript
+{
+  "error": 404,
+  "message": "404 Not Found: There are no categories available.",
+  "success": false
+}
+```
+
+### GET '/questions'
+Retrieve all questions
+#### parameters
+```
+page=<int:pagerequired> (default page=1)
+```
+#### returns
+```javascript
+success (true/false)
+total_questions (total number of questions in the database)
+current_category null
+categories (list of category ID and category description)
+questions (list of upto 10 questions for the page requested - id, question, answer, difficulty, category)
+```
+
+#### curl
+```bash
+curl http://127.0.0.1:5000/questions (defaults to page=1)
+curl http://127.0.0.1:5000/questions?page=1
+```
+#### response
+```javascript
+{
+  "success": true,
+  "total_questions": 33
+  "current_category": null,
+  "categories": {
+    "1": "Science",
+    "2": "Art",
+    "3": "Geography",
+    "4": "History",
+    "5": "Entertainment",
+    "6": "Sports"
+  },
+  "questions": [
+    {
+      "answer": "Apollo 13",
+      "category": 5,
+      "difficulty": 4,
+      "id": 2,
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    },
+    {
+      "answer": "The Palace of Versailles",
+      "category": 3,
+      "difficulty": 3,
+      "id": 14,
+      "question": "In which royal palace would you find the Hall of Mirrors?"
+    },
+    {
+      "answer": "Agra",
+      "category": 3,
+      "difficulty": 2,
+      "id": 15,
+      "question": "The Taj Mahal is located in which Indian city?"
+    }
+  ],
+}
+```
+
+
+#### curl to generate an error
+```bash
+curl http://127.0.0.1:5000/questions?page=99999
+```
+#### errors
+```javascript
+{
+  "error": 404,
+  "message": "404 Not Found: There are no questions available.",
+  "success": false
+}
+```
+
+
 
 ## Errors
+Errors are returned as JSON objects in the following format:
+```javascript
+{
+    "success": False, 
+    "error": 400,
+    "message": "bad request"
+}
+```
 
 ### Error Index
-The following errors can be returned by the API
+The following error types can be returned by the API when requests fail:
 ```
 400 Bad Request
 404 Not Found

@@ -41,6 +41,8 @@ In your terminal change to the `frontend` folder and run `npm start` which will 
 npm start
 ```
 
+By default, the frontend will run on localhost:3000. 
+
 ## Request Formatting
 
 The frontend should be fairly straightforward and disgestible. You'll primarily work within the ```components``` folder in order to edit the endpoints utilized by the components. While working on your backend request handling and response formatting, you can reference the frontend to view how it parses the responses. 
