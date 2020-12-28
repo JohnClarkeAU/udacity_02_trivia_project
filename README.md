@@ -17,9 +17,9 @@ This trivia app demonstrates the ability to structure plan, implement, and test 
 ## Code Style
 The code adheres to the [PEP 8 style guide](https://www.python.org/dev/peps/pep-0008/) and follows common best practices.  When updating the code please ensure that the PEP 8 style guide is followed including the following best practices:
 
-    [Variable and function names are clear](https://www.python.org/dev/peps/pep-0008/#prescriptive-naming-conventions).
-    Endpoints are logically named.
-    Code is [commented appropriately(https://www.python.org/dev/peps/pep-0008/#comments)].
+[Variable and function names are clear](https://www.python.org/dev/peps/pep-0008/#prescriptive-naming-conventions).
+Endpoints are logically named.
+Code is [commented appropriately(https://www.python.org/dev/peps/pep-0008/#comments)].
 
 ## Project Structure
 
