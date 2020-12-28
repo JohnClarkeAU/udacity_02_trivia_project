@@ -119,7 +119,7 @@ Tests are run using the `trivia_test` database so as to avoid corrupting the liv
 ### running the tests
 With Postgres running, create a database called trivia_test and restore the contents of the database tables using the trivia.psql file provided. 
 
-To run the tests, from the backend folder in terminal run:
+To run the tests, open a terminal window, change to the backend folder and run:
 
 ```bash
 dropdb trivia_test (not require on the first initial run)
@@ -127,6 +127,9 @@ createdb trivia_test
 psql trivia_test < trivia.psql
 python test_flaskr.py
 ```
+
+NOTE:
+`dropdb trivia_test` is used to remove any database that has been used in a previous test.
 
 # API Reference
 
@@ -143,6 +146,18 @@ PUT    '/questions'
 POST   '/questions'
 GET    '/categories/<category_id>/questions'
 POST   '/quizzes'
+```
+
+### GET '/'
+Accesses the home page of the backend which just displays "Hello"
+
+curl
+```bash
+curl http://127.0.0.1:5000/
+```
+output
+```bash
+Hello
 ```
 
 ## Errors
