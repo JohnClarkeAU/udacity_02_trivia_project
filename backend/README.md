@@ -144,6 +144,27 @@ flask run
 ## Base URL
 At present this app can only be run locally and is not hosted as a base URL. The backend app is hosted at the default, http://127.0.0.1:5000/, which is set as a proxy in the frontend configuration. 
 
+## Errors
+Errors are returned as JSON objects in the following format:
+```javascript
+{
+    "success": false, 
+    "error": 400,
+    "message": "bad request"
+}
+```
+
+### Error Index
+The following error types can be returned by the API when requests fail:
+```
+400 Bad Request
+404 Not Found
+405 Method Not Allowed
+422 Unprocessable
+500 Internal Error
+```
+
+
 ## Endpoints
 
 ### Endpoints Index
@@ -159,6 +180,7 @@ GET    '/categories/<category_id>/questions'
 POST   '/quizzes'
 ```
 
+---
 ### GET '/'
 Accesses the home page of the backend which just displays "Hello"
 
@@ -175,6 +197,7 @@ Hello
 none
 ```
 
+---
 ### GET '/categories'
 Retrieve all categories
 
@@ -205,6 +228,7 @@ curl http://127.0.0.1:5000/categories
 }
 ```
 
+---
 ### GET '/questions'
 Retrieve all questions
 #### parameters
@@ -212,7 +236,7 @@ Retrieve all questions
 page=<int:pagerequired> (default page=1)
 ```
 #### returns
-```javascript
+```
 success (true/false)
 total_questions (total number of questions in the database)
 current_category null
@@ -279,27 +303,216 @@ curl http://127.0.0.1:5000/questions?page=99999
 }
 ```
 
+---
+### DELETE '/questions/<int:question_id>'
+Delete a specific question
 
-
-## Errors
-Errors are returned as JSON objects in the following format:
+#### curl
+```bash
+curl -X DELETE http://127.0.0.1:5000/questions/15
+```
+#### response
 ```javascript
 {
-    "success": False, 
-    "error": 400,
-    "message": "bad request"
+  "deleted": "15",
+  "success": true
+}
+```
+#### curl to generate an error
+```bash
+curl -X DELETE http://127.0.0.1:5000/questions/99999
+```
+#### errors
+```javascript
+{
+  "error": 404,
+  "message": "404 Not Found: Question ID does not exist.",
+  "success": false
 }
 ```
 
-### Error Index
-The following error types can be returned by the API when requests fail:
+---
+### PUT '/questions'
+Add a new question to the database
+#### parameters
 ```
-400 Bad Request
-404 Not Found
-405 Method Not Allowed
-422 Unprocessable
-500 Internal Error
+question=<str:text_of_the_question>
+answer=<str:text_of_the_answer>
+difficulty=<int:1-5>
+category=<int:category_id>
 ```
+
+#### curl
+```bash
+curl -X PUT http://127.0.0.1:5000/questions --header "Content-Type:application/json" -d '{"question": "What colour is the sky", "answer": "Blue", "difficulty": "3", "category": "4"}'
+```
+#### response
+```javascript
+{
+  "success": true
+}
+```
+
+#### curl to generate an error
+The question, answer, difficulty and category parameters are not supplied
+```bash
+curl -X PUT http://127.0.0.1:5000/questions
+```
+#### errors
+```javascript
+{
+  "error": 422,
+  "message": "422 Unprocessable Entity: question, answer, difficulty and category must be supplied.",
+  "success": false
+}
+```
+#### other errors
+```javascript
+  "message": "422 Unprocessable Entity: None of the fields may be blank.",
+  "message": "422 Unprocessable Entity: The difficulty must be between 1 and 5 inclusive.",
+  "message": "422 Unprocessable Entity: The category specified does not exist.",
+  "message": "422 Unprocessable Entity: Unexpected error accessing the database.",
+```
+
+---
+### POST '/questions?page=<int:pagerequired>'
+(page is optional - default page=1)
+Search for any questions for whom the search term is a substring of the question.
+
+#### parameters
+```
+searchTerm=<str:search_term>
+```
+
+#### curl
+```bash
+curl -X POST http://127.0.0.1:5000/questions?page=1 --header "Content-Type:application/json" -d '{"searchTerm": "beetle"}'
+```
+#### response
+```javascript
+{
+  "success": true,
+  "total_questions": 33
+  "current_category": null,
+  "questions": [
+    {
+      "answer": "Scarab",
+      "category": 4,
+      "difficulty": 4,
+      "id": 23,
+      "question": "Which dung beetle was worshipped by the ancient Egyptians?"
+    }
+  ],
+}
+```
+
+#### curl to generate a not found error
+The searchTerm does not match any questions
+```bash
+curl -X POST http://127.0.0.1:5000/questions?page=1 --header "Content-Type:application/json" -d '{"searchTerm": "zzzz"}'
+```
+#### not found error
+```javascript
+{
+  "error": 404,
+  "message": "404 Not Found: There are no questions matching the searchTerm.",
+  "success": false
+}
+```
+#### curl to generate an error
+The searchTerm parameter is  not supplied
+```bash
+curl -X POST http://127.0.0.1:5000/questions
+```
+#### errors
+```javascript
+{
+  "error": 422,
+  "message": "422 Unprocessable Entity: searchTerm must be supplied.",
+  "success": false
+}
+```
+#### other errors
+```javascript
+  "message": "422 Unprocessable Entity: Unexpected error accessing the database.",
+  "message": "404 Not Found: There are no questions matching the searchTerm.",
+  "message": "404 Not Found: There are no more questions matching the searchTerm.",
+```
+
+---
+### GET '/categories/<int:category_id>/questions?page=<int:pagerequired>'
+(page is optional - default page=1)
+Search for any questions within a specific category.
+
+#### parameters
+```
+none
+```
+
+#### curl
+```bash
+curl http://127.0.0.1:5000/categories/3/questions?page=1
+```
+#### response
+```javascript
+{
+  "success": true,
+  "questions": [
+    {
+      "answer": "Lake Victoria",
+      "category": 3,
+      "difficulty": 2,
+      "id": 13,
+      "question": "What is the largest lake in Africa?"
+    },
+    {
+      "answer": "NewA1",
+      "category": 3,
+      "difficulty": 3,
+      "id": 39,
+      "question": "NewQ1"
+    },
+    {
+      "answer": "A13",
+      "category": 3,
+      "difficulty": 2,
+      "id": 42,
+      "question": "Q13"
+    }
+  ],
+}
+```
+
+#### curl to generate a not found error
+An invalid category is specified
+```bash
+curl http://127.0.0.1:5000/categories/9999/questions?page=1
+```
+#### not found error
+```javascript
+{
+  "error": 404,
+  "message": "404 Not Found: No questions match that search.",
+  "success": false
+}
+```
+#### other errors
+```javascript
+  "message": "422 Unprocessable Entity: Unexpected error accessing the database.",
+```
+
+### POST '/quizzes'
+Using the category and previous question parameters,
+return a random questions within the given category,
+if provided, and that is not one of the previous questions.
+
+#### parameters
+```
+previous_questions a list of question_IDs that should not be returned
+quiz_category 0=questions from any category, otherwise only return questions from the category specified
+```
+
+
 
 REVIEW_COMMENT
 ```

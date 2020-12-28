@@ -142,14 +142,17 @@ def create_app(test_config=None):
 
     @app.route('/questions', methods=['PUT'])
     def put_questions():
-        question = request.json.get('question')
-        answer = request.json.get('answer')
-        difficulty = request.json.get('difficulty')
-        category = request.json.get('category')
+        try:
+            question = request.json.get('question')
+            answer = request.json.get('answer')
+            difficulty = request.json.get('difficulty')
+            category = request.json.get('category')
+        except:
+            abort(422, "question, answer, difficulty and category must be supplied.")
 
         # check that all fields have been submitted
         if question is None or answer is None or difficulty is None or category is None:
-            abort(422, description="Question, Answer, Difficulty and a Category required.")
+            abort(422, "question, answer, difficulty and category must be supplied.")
         # check that none of the fields are blank
         if question == '' or answer == '' or difficulty == '' or category == '':
             abort(422, description="None of the fields may be blank.")
@@ -172,7 +175,7 @@ def create_app(test_config=None):
                 "success": True
             })
         except:
-            abort(422, "Unexpected Error")
+            abort(422, "Unexpected error accessing the database.")
 
     # TEST: When you submit a question on the "Add" tab,
     #  the form will clear and the question will appear at the end of the last page
@@ -182,16 +185,26 @@ def create_app(test_config=None):
     #  It should return any questions for whom the search term is a substring of the question.
     @app.route('/questions', methods=['POST'])
     def search_questions():
-        # Get a page of questions
-        search_term = '%' + request.json.get('searchTerm', None) + '%'
-        questions = Question.query.filter(Question.question.ilike(search_term)).all()
-        formatted_questions = paginate_questions(request, questions)
+        # get the searchTerm
+        try:
+            search_term = '%' + request.json.get('searchTerm', None) + '%'
+        except:
+            abort(422, description="searchTerm must be supplied.")
 
-        total_questions = Question.query.count()
+        # Get a page of questions
+        try:
+            questions = Question.query.filter(Question.question.ilike(search_term)).all()
+            formatted_questions = paginate_questions(request, questions)
+            total_questions = Question.query.count()
+        except:
+            abort(422, description="Unexpected error accessing the database.")
 
         # abort with 404 if there are not any questions to return
+        if len(questions) == 0:
+            abort(404, description="There are no questions matching the searchTerm.")
+
         if len(formatted_questions) == 0:
-            abort(404)
+            abort(404, description="There are no more questions matching the searchTerm.")
 
         return jsonify({
             'success': True,
@@ -208,8 +221,11 @@ def create_app(test_config=None):
     @app.route('/categories/<category_id>/questions')
     def retrieve_questions_by_category(category_id):
         # Get a page of questions
-        questions = Question.query.filter_by(category=category_id).order_by(Question.id).all()
-        formatted_questions = paginate_questions(request, questions)
+        try:
+            questions = Question.query.filter_by(category=category_id).order_by(Question.id).all()
+            formatted_questions = paginate_questions(request, questions)
+        except:
+            abort(422, description="Unexpected error accessing the database.")
 
         # abort with 404 if there are not any questions to return
         if len(formatted_questions) == 0:
