@@ -8,9 +8,29 @@
 
 Follow instructions to install the latest version of python for your platform in the [python docs](https://docs.python.org/3/using/unix.html#getting-and-installing-the-latest-version-of-python)
 
+NOTE: 
+This project was originally developed using Python 3.7.
+If you are using Python 3.8 you may need to amend a Date/Time function in one of the libraries.
+
 #### Virtual Enviornment
 
 We recommend working within a virtual environment whenever using Python for projects. This keeps your dependencies for each project separate and organaized. Instructions for setting up a virual enviornment for your platform can be found in the [python docs](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/)
+
+You can  set up your virtual environment on Windows using Python 3, by naviging to the `/backend` directory and running:
+
+```bash
+py -m venv env
+```
+
+On macOS and Linux use:
+```bash
+python3 -m venv env
+```
+
+venv will create a virtual Python installation in the `/backend/env` folder.
+
+NOTE:
+You should exclude your virtual environment directory from your version control system using `.gitignore` or similar.
 
 #### PIP Dependencies
 
@@ -22,6 +42,9 @@ pip install -r requirements.txt
 
 This will install all of the required packages we selected within the `requirements.txt` file.
 
+NOTE: 
+If you encounter error messages indicating that you require Visual C++ 14 compiler files you will need to follow the instructions to download them and install them, or you can manually install each of the packages in the requirements.txt file.
+
 ##### Key Dependencies
 
 - [Flask](http://flask.pocoo.org/)  is a lightweight backend microservices framework. Flask is required to handle requests and responses.
@@ -31,14 +54,30 @@ This will install all of the required packages we selected within the `requireme
 - [Flask-CORS](https://flask-cors.readthedocs.io/en/latest/#) is the extension we'll use to handle cross origin requests from our frontend server. 
 
 ## Database Setup
-With Postgres running, restore a database using the trivia.psql file provided. From the backend folder in terminal run:
+With Postgres running, create a database called trivia and restore the contents of the database tables using the trivia.psql file provided. 
+
+From the backend folder in terminal run:
+
 ```bash
+dropdb trivia (not require on the first initial setup)
+createdb trivia
 psql trivia < trivia.psql
 ```
 
 ## Running the server
 
-From within the `backend` directory first ensure you are working using your created virtual environment.
+From within the `backend` directory first ensure you are working using your created virtual environment.  
+
+```bash
+source env/Scripts/activate
+```
+You should now see (env) displayed as part of your terminal prompt.
+
+To leave the virtual environment when you have finished running the server:
+
+```bash
+deactivate
+```
 
 To run the server, execute:
 
@@ -52,19 +91,71 @@ Setting the `FLASK_ENV` variable to `development` will detect file changes and r
 
 Setting the `FLASK_APP` variable to `flaskr` directs flask to use the `flaskr` directory and the `__init__.py` file to find the application. 
 
-## Tasks
+## Features
 
-One note before you delve into your tasks: for each endpoint you are expected to define the endpoint and response data. The frontend will be a plentiful resource because it is set up to expect certain endpoints and response data formats already. You should feel free to specify endpoints in your own way; if you do so, make sure to update the frontend or you will get some unexpected behavior. 
+Within the backend API each endpoint defines the endpoint and response data. 
 
-1. Use Flask-CORS to enable cross-domain requests and set response headers. 
-2. Create an endpoint to handle GET requests for questions, including pagination (every 10 questions). This endpoint should return a list of questions, number of total questions, current category, categories. 
-3. Create an endpoint to handle GET requests for all available categories. 
-4. Create an endpoint to DELETE question using a question ID. 
-5. Create an endpoint to POST a new question, which will require the question and answer text, category, and difficulty score. 
-6. Create a POST endpoint to get questions based on category. 
-7. Create a POST endpoint to get questions based on a search term. It should return any questions for whom the search term is a substring of the question. 
-8. Create a POST endpoint to get questions to play the quiz. This endpoint should take category and previous question parameters and return a random questions within the given category, if provided, and that is not one of the previous questions. 
-9. Create error handlers for all expected errors including 400, 404, 422 and 500. 
+The frontend can be reviewed to identify the endpoints that the backend is expected to service together with the response data formats required. 
+
+You should feel free to specify endpoints in your own way; if you do so, make sure to update the frontend or you will get some unexpected behavior. 
+
+1. Flask-CORS is used to enable cross-domain requests and set response headers. 
+2. An endpoint handles GET requests for questions, including pagination (every 10 questions). This endpoint returns a list of questions, number of total questions, current category, categories. 
+3. An endpoint handles GET requests for all available categories. 
+4. An endpoint DELETEs a question using a question ID. 
+5. An endpoint POSTs a new question, which will require the question and answer text, category, and difficulty score. 
+6. A POST endpoint gets questions based on category. 
+7. A POST endpoint gets questions based on a search term. It returns any questions for whom the search term is a substring of the question. 
+8. A POST endpoint gets questions to play the quiz. This endpoint takea category and previous question parameters and returns a random questions within the given category, if provided, and that is not one of the previous questions. 
+9. There are error handlers for all expected errors including 400, 404, 422 and 500. 
+
+## Testing the API
+The unitest library has been used to create one or more tests for each endpoint to test for expected success and error behaviour.
+
+All the tests are included in the test_flasker.py file within the backend folder.  When updating the project ensure that the tests are run and that they all pass.  When adding new functionality appropriate tests should be added to the test_flasker.py file.
+
+Tests are run using the `trivia_test` database so as to avoid corrupting the live `trivia` database.
+
+### running the tests
+With Postgres running, create a database called trivia_test and restore the contents of the database tables using the trivia.psql file provided. 
+
+To run the tests, from the backend folder in terminal run:
+
+```bash
+dropdb trivia_test (not require on the first initial run)
+createdb trivia_test
+psql trivia_test < trivia.psql
+python test_flaskr.py
+```
+
+# API Reference
+
+## Endpoints
+
+### Endpoints Index
+The following endpoints are accepted by the API
+```
+GET    '/'
+GET    '/categories'
+GET    '/questions'
+DELETE '/questions/<question_id>'
+PUT    '/questions'
+POST   '/questions'
+GET    '/categories/<category_id>/questions'
+POST   '/quizzes'
+```
+
+## Errors
+
+### Error Index
+The following errors can be returned by the API
+```
+400 Bad Request
+404 Not Found
+405 Method Not Allowed
+422 Unprocessable
+500 Internal Error
+```
 
 REVIEW_COMMENT
 ```
@@ -90,11 +181,3 @@ GET '/categories'
 ```
 
 
-## Testing
-To run the tests, run
-```
-dropdb trivia_test
-createdb trivia_test
-psql trivia_test < trivia.psql
-python test_flaskr.py
-```

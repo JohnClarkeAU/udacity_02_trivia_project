@@ -35,7 +35,7 @@ class FormView extends Component {
     event.preventDefault();
     $.ajax({
       url: '/questions', //TODO: update request URL
-      type: "POST",
+      type: "PUT",
       dataType: 'json',
       contentType: 'application/json',
       data: JSON.stringify({
@@ -50,10 +50,22 @@ class FormView extends Component {
       crossDomain: true,
       success: (result) => {
         document.getElementById("add-question-form").reset();
+        this.state = {
+            question: "",
+            answer: "",
+            difficulty: 1,
+            category: 1,
+            categories: {}
+          }
         return;
       },
-      error: (error) => {
-        alert('Unable to add question. Please try your request again')
+      error: (xhr, status, thrownError) => {
+        var errorMessage = xhr.status + ': ' + xhr.statusText + "\r\n\r\n" + $.parseJSON(xhr.responseText).message
+        alert('Error - ' + errorMessage);
+        // alert('Unable to add question. Please try your request again')
+        // alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        // alert($.parseJSON(xhr.responseText).message)
+        // alert(error)
         return;
       }
     })

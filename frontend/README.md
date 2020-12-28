@@ -20,9 +20,15 @@ npm install
 
 >_tip_: **npm i** is shorthand for **npm install**
 
+NOTE:
+You should exclude your node modules directory from your version control system using `.gitignore` or similar.
+
 ## Required Tasks
 
+
 ## Running Your Frontend in Dev Mode
+
+>_tip_: Before starting your Frontend you must ensure that your Postgres database server is running and that the Backend is running and tested using Postman or curl.
 
 The frontend app was built using create-react-app. In order to run the app in development mode use ```npm start```. You can change the script in the ```package.json``` file. 
 
