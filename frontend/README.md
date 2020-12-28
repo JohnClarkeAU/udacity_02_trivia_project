@@ -32,7 +32,10 @@ You should exclude your node modules directory from your version control system 
 
 The frontend app was built using create-react-app. In order to run the app in development mode use ```npm start```. You can change the script in the ```package.json``` file. 
 
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser. The page will reload if you make edits.<br>
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser. The page will reload if you make edits.
+
+### To start the frontend app
+In your terminal change to the `frontend` folder and run `npm start` which will load the application and then open the application in your browser.
 
 ```bash
 npm start
