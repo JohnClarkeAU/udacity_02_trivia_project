@@ -56,7 +56,7 @@ class TriviaTestCase(unittest.TestCase):
         data = (res.data)
 
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.data, b'Hello')
+        self.assertEqual(res.data, b'Hello\r\n')
 
     def test_retrieve_categories(self):
         ''' GET requests for all available categories '''
