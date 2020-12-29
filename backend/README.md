@@ -97,19 +97,21 @@ The application is run on http://127.0.0.1:5000/ by default and is a proxy in th
 
 Within the backend API each endpoint defines the endpoint and response data. 
 
+1. Flask-CORS is used to enable cross-domain requests and set response headers. 
+2. There are error handlers for all expected errors including 400, 404, 405, 422 and 500. 
+
 The frontend can be reviewed to identify the endpoints that the backend is expected to service together with the response data formats required. 
 
 You should feel free to specify endpoints in your own way; if you do so, make sure to update the frontend or you will get some unexpected behavior. 
 
-1. Flask-CORS is used to enable cross-domain requests and set response headers. 
-2. An endpoint handles GET requests for questions, including pagination (every 10 questions). This endpoint returns a list of questions, number of total questions, current category, categories. 
-3. An endpoint handles GET requests for all available categories. 
-4. An endpoint DELETEs a question using a question ID. 
-5. An endpoint POSTs a new question, which will require the question and answer text, category, and difficulty score. 
-6. A POST endpoint gets questions based on category. 
-7. A POST endpoint gets questions based on a search term. It returns any questions for whom the search term is a substring of the question. 
-8. A POST endpoint gets questions to play the quiz. This endpoint takea category and previous question parameters and returns a random questions within the given category, if provided, and that is not one of the previous questions. 
-9. There are error handlers for all expected errors including 400, 404, 405, 422 and 500. 
+1. [GET    '/'](#get-) A dummy endpoint that displays 'Hello' to check if the server is running
+2. [GET    '/categories'](#get-categories) An endpoint that handles GET requests for all available categories. 
+3. [GET    '/questions'](#get-questionsspageintpagerequired) An endpoint that handles GET requests for questions, including pagination (every 10 questions). This endpoint returns a list of questions, number of total questions, current category, categories. 
+4. [DELETE '/questions/<question_id>'](#delete-questionsintquestion_id) An endpoint that DELETEs a question using a question ID. 
+5. [PUT    '/questions'](#put-questions)] An endpoint that PUTs a new question into the database, which will require the question and answer text, category, and difficulty score. 
+6. [POST   '/questions'](#post-questionspageintpagerequired)] A POST endpoint that gets questions based on a search term. It returns any questions for whom the search term is a substring of the question. 
+7. [GET    '/categories/<category_id>/questions'](#get-categoriesintcategory_idquestionspageintpagerequired) A GET endpoint that gets questions based on category_id. 
+8. [POST   '/quizzes'](#post-quizes) A POST endpoint that gets questions to play the quiz. This endpoint takea category and previous question parameters and returns a random questions within the given category, if provided, and that is not one of the previous questions. 
 
 ## Testing the API
 The unitest library has been used to create one or more tests for each endpoint to test for expected success and error behaviour.
@@ -171,7 +173,7 @@ The following error types can be returned by the API when requests fail:
 
 ### Endpoints Index
 The following endpoints are accepted by the API
-```
+
 GET    '/'
 GET    '/categories'
 GET    '/questions'
@@ -180,7 +182,6 @@ PUT    '/questions'
 POST   '/questions'
 GET    '/categories/<category_id>/questions'
 POST   '/quizzes'
-```
 
 ---
 ### GET '/'
@@ -412,7 +413,7 @@ curl -X POST http://127.0.0.1:5000/questions?page=1 --header "Content-Type:appli
 ```json
 {
   "success": true,
-  "total_questions": 33
+  "total_questions": 33,
   "current_category": null,
   "questions": [
     {
