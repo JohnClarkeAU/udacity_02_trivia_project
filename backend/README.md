@@ -109,7 +109,7 @@ You should feel free to specify endpoints in your own way; if you do so, make su
 6. A POST endpoint gets questions based on category. 
 7. A POST endpoint gets questions based on a search term. It returns any questions for whom the search term is a substring of the question. 
 8. A POST endpoint gets questions to play the quiz. This endpoint takea category and previous question parameters and returns a random questions within the given category, if provided, and that is not one of the previous questions. 
-9. There are error handlers for all expected errors including 400, 404, 422 and 500. 
+9. There are error handlers for all expected errors including 400, 404, 405, 422 and 500. 
 
 ## Testing the API
 The unitest library has been used to create one or more tests for each endpoint to test for expected success and error behaviour.
@@ -118,7 +118,7 @@ All the tests are included in the test_flasker.py file within the backend folder
 
 Tests are run using the `trivia_test` database so as to avoid corrupting the live `trivia` database.
 
-### running the tests
+### Running the tests
 With Postgres running, create a database called trivia_test and restore the contents of the database tables using the trivia.psql file provided. 
 
 To run the tests, open a terminal window, change to the backend folder and run:
@@ -134,7 +134,7 @@ NOTE:
 `dropdb trivia_test` is used to remove any database that has been used in a previous test.
 
 # API Reference
-To use the API endpoints you must first run the server using the following commands:
+To use the API endpoints you must first run the backend server using the following commands:
 ```bash
 export FLASK_APP=flaskr
 export FLASK_ENV=development
@@ -142,11 +142,13 @@ flask run
 ```
 
 ## Base URL
-At present this app can only be run locally and is not hosted as a base URL. The backend app is hosted at the default, http://127.0.0.1:5000/, which is set as a proxy in the frontend configuration. 
+At present this app can only be run locally and is not hosted as a base URL. 
+
+The backend app is hosted at the default, http://127.0.0.1:5000/, which is set as a proxy in the frontend configuration. 
 
 ## Errors
 Errors are returned as JSON objects in the following format:
-```javascript
+```json
 {
     "success": false, 
     "error": 400,
@@ -206,9 +208,9 @@ Retrieve all categories
 curl http://127.0.0.1:5000/categories
 ```
 #### response
-```javascript
+```json
 {
-  "success": true
+  "success": true,
   "categories": {     
     "1": "Science",   
     "2": "Art",       
@@ -220,7 +222,7 @@ curl http://127.0.0.1:5000/categories
 }
 ```
 #### errors
-```javascript
+```json
 {
   "error": 404,
   "message": "404 Not Found: There are no categories available.",
@@ -229,9 +231,11 @@ curl http://127.0.0.1:5000/categories
 ```
 
 ---
-### GET '/questions'
-Retrieve all questions
-#### parameters
+### GET '/questionss?page=<int:pagerequired>'
+(page is optional - default page=1)
+
+Retrieve all questions (up to 10 per page)
+#### URL parameters
 ```
 page=<int:pagerequired> (default page=1)
 ```
@@ -250,10 +254,10 @@ curl http://127.0.0.1:5000/questions (defaults to page=1)
 curl http://127.0.0.1:5000/questions?page=1
 ```
 #### response
-```javascript
+```json
 {
   "success": true,
-  "total_questions": 33
+  "total_questions": 33,
   "current_category": null,
   "categories": {
     "1": "Science",
@@ -291,39 +295,41 @@ curl http://127.0.0.1:5000/questions?page=1
 
 
 #### curl to generate an error
+Page nuber is past the end.
 ```bash
 curl http://127.0.0.1:5000/questions?page=99999
 ```
 #### errors
-```javascript
+```json
 {
   "error": 404,
-  "message": "404 Not Found: There are no questions available.",
+  "message": "404 Not Found: There are no questions on that page.",
   "success": false
 }
 ```
 
 ---
 ### DELETE '/questions/<int:question_id>'
-Delete a specific question
+Delete a specific question with the ID specified.
 
 #### curl
 ```bash
 curl -X DELETE http://127.0.0.1:5000/questions/15
 ```
 #### response
-```javascript
+```json
 {
-  "success": true
-  "deleted": "15",
+  "success": true,
+  "deleted": "15"
 }
 ```
 #### curl to generate an error
+An invalid ID is specified.
 ```bash
 curl -X DELETE http://127.0.0.1:5000/questions/99999
 ```
 #### errors
-```javascript
+```json
 {
   "error": 404,
   "message": "404 Not Found: Question ID does not exist.",
@@ -334,20 +340,28 @@ curl -X DELETE http://127.0.0.1:5000/questions/99999
 ---
 ### PUT '/questions'
 Add a new question to the database
-#### parameters
+#### json parameters
 ```
 question=<str:text_of_the_question>
 answer=<str:text_of_the_answer>
 difficulty=<int:1-5>
 category=<int:category_id>
 ```
-
+##### sample json parameters
+```json
+{
+    "question": "What colour is the sky",
+    "answer": "Blue",
+    "difficulty": "3",
+    "category": "4"
+}
+```
 #### curl
 ```bash
 curl -X PUT http://127.0.0.1:5000/questions --header "Content-Type:application/json" -d '{"question": "What colour is the sky", "answer": "Blue", "difficulty": "3", "category": "4"}'
 ```
 #### response
-```javascript
+```json
 {
   "success": true
 }
@@ -378,19 +392,24 @@ curl -X PUT http://127.0.0.1:5000/questions
 ### POST '/questions?page=<int:pagerequired>'
 (page is optional - default page=1)
 
-Search for any questions for whom the search term is a substring of the question.
+Search for any questions for whom the search term is a substring of the question (up to 10 per page).
 
 #### parameters
 ```
 searchTerm=<str:search_term>
 ```
-
+##### sample json parameters
+```json
+{
+    "searchTerm": "beetle"
+}
+```
 #### curl
 ```bash
 curl -X POST http://127.0.0.1:5000/questions?page=1 --header "Content-Type:application/json" -d '{"searchTerm": "beetle"}'
 ```
 #### response
-```javascript
+```json
 {
   "success": true,
   "total_questions": 33
@@ -413,7 +432,7 @@ The searchTerm does not match any questions
 curl -X POST http://127.0.0.1:5000/questions?page=1 --header "Content-Type:application/json" -d '{"searchTerm": "zzzz"}'
 ```
 #### not found error
-```javascript
+```json
 {
   "error": 404,
   "message": "404 Not Found: There are no questions matching the searchTerm.",
@@ -426,7 +445,7 @@ The searchTerm parameter is  not supplied
 curl -X POST http://127.0.0.1:5000/questions
 ```
 #### errors
-```javascript
+```json
 {
   "error": 422,
   "message": "422 Unprocessable Entity: searchTerm must be supplied.",
@@ -434,7 +453,7 @@ curl -X POST http://127.0.0.1:5000/questions
 }
 ```
 #### other errors
-```javascript
+```json
   "message": "422 Unprocessable Entity: Unexpected error accessing the database.",
   "message": "404 Not Found: There are no questions matching the searchTerm.",
   "message": "404 Not Found: There are no more questions matching the searchTerm.",
@@ -443,7 +462,8 @@ curl -X POST http://127.0.0.1:5000/questions
 ---
 ### GET '/categories/<int:category_id>/questions?page=<int:pagerequired>'
 (page is optional - default page=1)
-Search for any questions within a specific category.
+
+Search for any questions within a specific category (up to 10 per page).
 
 #### parameters
 ```
@@ -455,7 +475,7 @@ none
 curl http://127.0.0.1:5000/categories/3/questions?page=1
 ```
 #### response
-```javascript
+```json
 {
   "success": true,
   "questions": [
@@ -490,7 +510,7 @@ An invalid category is specified
 curl http://127.0.0.1:5000/categories/9999/questions?page=1
 ```
 #### not found error
-```javascript
+```json
 {
   "error": 404,
   "message": "404 Not Found: No questions match that search.",
@@ -498,19 +518,21 @@ curl http://127.0.0.1:5000/categories/9999/questions?page=1
 }
 ```
 #### other errors
-```javascript
+```json
+  "message": "404 Not Found: There are no more questions that match that search..",
   "message": "422 Unprocessable Entity: Unexpected error accessing the database.",
 ```
 
+---
 ### POST '/quizzes'
-Using the category and previous question parameters, return a random question within the given category (if provided), and that is not one of the previous questions.
+Using the category and previous question parameters, return a random question within the given category (if provided), that is not one of the previous questions.
 
 #### json parameters
 ```
 previous_questions a list of question_IDs that should not be returned
 quiz_category['id'] 0=questions from any category, otherwise only return questions from the category specified
 ```
-##### sample json parametes
+##### sample json parameters
 ```json
 {
     "previous_questions": [
@@ -558,10 +580,12 @@ curl -X POST http://127.0.0.1:5000/quizzes --header "Content-Type:application/js
     "question": "How many paintings did Van Gogh sell in his lifetime?"
   },
 }
+```
 
 #### curl to generate an error (previous questions not a list)
 ```bash
-curl -X POST http://127.0.0.1:5000/quizzes --header "Content-Type:application/json" -d '{ "previous_questions": 0, "quiz_category": {"type":"click","id":0} }'```
+curl -X POST http://127.0.0.1:5000/quizzes --header "Content-Type:application/json" -d '{ "previous_questions": 0, "quiz_category": {"type":"click","id":0} }'
+```
 #### error response
 ```json
 {
@@ -578,28 +602,3 @@ curl -X POST http://127.0.0.1:5000/quizzes --header "Content-Type:application/js
   "message": "422 Unprocessable Entity: A quiz_category['id'] parameter must be provided (set 'id':0 to specify any category).",
   "message": "422 Unprocessable Entity: Unexpected error accessing the database.",
 ```
-
-REVIEW_COMMENT
-```
-This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code. 
-
-Endpoints
-GET '/categories'
-GET ...
-POST ...
-DELETE ...
-
-GET '/categories'
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
-- Request Arguments: None
-- Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs. 
-{'1' : "Science",
-'2' : "Art",
-'3' : "Geography",
-'4' : "History",
-'5' : "Entertainment",
-'6' : "Sports"}
-
-```
-
-

@@ -228,8 +228,11 @@ def create_app(test_config=None):
             abort(422, description="Unexpected error accessing the database.")
 
         # abort with 404 if there are not any questions to return
-        if len(formatted_questions) == 0:
+        if len(questions) == 0:
             abort(404, description="No questions match that search.")
+
+        if len(formatted_questions) == 0:
+            abort(404, description="There are no more questions that match that search.")
 
         return jsonify({
             'success': True,
