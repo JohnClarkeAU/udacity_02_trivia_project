@@ -245,37 +245,55 @@ def create_app(test_config=None):
     #  if provided, and that is not one of the previous questions.
     @app.route('/quizzes', methods=['POST'])
     def get_a_question():
-        """ return a random questions within the given category """
-        # get the category and any previous questions
-
+        """ return a random question within the given category """
+        # get the category and any previous questions parameters
         req_data = request.get_json()
-        previous_questions = None
+        # check if req_data is usable by the following code
+        try:
+            check_iterable = iter(req_data)
+        except:
+            abort(422, description="Your json parameters are invalid.")
+        
+        previous_questions = []
         if 'previous_questions' in req_data:
             previous_questions = req_data['previous_questions']
+        else:
+            abort(422, description="A list of previous_questions parameter must be provided (even if it is empty).")
+        if not isinstance(previous_questions, list):
+            abort(422, description="The previous_questions parameter must be a list (even if it is empty).")
 
-        quiz_category = None
+        quiz_category = {"type":"click","id":0}
         if 'quiz_category' in req_data:
             quiz_category = req_data['quiz_category']
-
-        # previous_questions = request.json.get('previous_questions', None)
-        # quiz_category = request.json.get('quiz_category', None)
-
-        # if a category specified restrict questions to that category
-        if quiz_category['id'] == 0:
-            questions = Question.query.filter(Question.id.notin_(previous_questions)).all()
         else:
-            questions = Question.query.filter_by(category=quiz_category['id']).filter(Question.id.notin_(previous_questions)).all()
+            abort(422, description="A quiz_category parameter must be provided (set 'id':0 to specify any category).")
 
-        # return the random question if found
-        questions_found = len(questions)
-        if questions_found:
-            question = Question.format(questions[random.randrange(0,questions_found)])
+        required_category = 0
+        if 'id' in quiz_category:
+            required_category = quiz_category['id']
         else:
-            question = None
-        return jsonify({
-            'success': True,
-            'question': question
-        })
+            abort(422, description="A quiz_category['id'] parameter must be provided (set 'id':0 to specify any category).")
+
+        try:
+            # if a category specified restrict questions to that category
+            if required_category == 0:
+                questions = Question.query.filter(Question.id.notin_(previous_questions)).all()
+            else:
+                questions = Question.query.filter_by(category=required_category).filter(Question.id.notin_(previous_questions)).all()
+
+            # return the random question if found
+            questions_found = len(questions)
+            if questions_found:
+                question = Question.format(questions[random.randrange(0,questions_found)])
+            else:
+                question = None
+            return jsonify({
+                'success': True,
+                'question': question
+            })
+        except:
+            abort(422, description="Unexpected error accessing the database.")
+            
 
     # TEST: In the "Play" tab, after a user selects "All" or a category,
     #  one question at a time is displayed, the user is allowed to answer

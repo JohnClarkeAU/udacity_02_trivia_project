@@ -314,8 +314,8 @@ curl -X DELETE http://127.0.0.1:5000/questions/15
 #### response
 ```javascript
 {
-  "deleted": "15",
   "success": true
+  "deleted": "15",
 }
 ```
 #### curl to generate an error
@@ -377,6 +377,7 @@ curl -X PUT http://127.0.0.1:5000/questions
 ---
 ### POST '/questions?page=<int:pagerequired>'
 (page is optional - default page=1)
+
 Search for any questions for whom the search term is a substring of the question.
 
 #### parameters
@@ -502,17 +503,81 @@ curl http://127.0.0.1:5000/categories/9999/questions?page=1
 ```
 
 ### POST '/quizzes'
-Using the category and previous question parameters,
-return a random questions within the given category,
-if provided, and that is not one of the previous questions.
+Using the category and previous question parameters, return a random question within the given category (if provided), and that is not one of the previous questions.
 
-#### parameters
+#### json parameters
 ```
 previous_questions a list of question_IDs that should not be returned
-quiz_category 0=questions from any category, otherwise only return questions from the category specified
+quiz_category['id'] 0=questions from any category, otherwise only return questions from the category specified
+```
+##### sample json parametes
+```json
+{
+    "previous_questions": [
+        21,
+        31,
+        34
+    ],
+    "quiz_category": {
+        "type": "Science",
+        "id": 1
+    }
+}
 ```
 
+#### curl (get a question in the Science Category)
+```bash
+curl -X POST http://127.0.0.1:5000/quizzes --header "Content-Type:application/json" -d '{ "previous_questions": [21,31,34], "quiz_category": {"type":"Science","id":1} }'
+```
+#### response
+```json
+{
+  "success": true,
+  "question": {
+    "answer": "The Liver",
+    "category": 1,
+    "difficulty": 4,
+    "id": 20,
+    "question": "What is the heaviest organ in the human body?"
+  },
+}
+```
+#### curl (get any question in any Category)
+```bash
+curl -X POST http://127.0.0.1:5000/quizzes --header "Content-Type:application/json" -d '{ "previous_questions": [], "quiz_category": {"type":"click","id":0} }'
+```
+#### response
+```json
+{
+  "success": true,
+  "question": {
+    "answer": "One",
+    "category": 2,
+    "difficulty": 4,
+    "id": 18,
+    "question": "How many paintings did Van Gogh sell in his lifetime?"
+  },
+}
 
+#### curl to generate an error (previous questions not a list)
+```bash
+curl -X POST http://127.0.0.1:5000/quizzes --header "Content-Type:application/json" -d '{ "previous_questions": 0, "quiz_category": {"type":"click","id":0} }'```
+#### error response
+```json
+{
+  "error": 422,
+  "message": "422 Unprocessable Entity: The previous_questions parameter must be a list (even if it is empty)",
+  "success": false
+}
+```
+#### other errors
+```json
+  "message": "422 Unprocessable Entity: A list of previous_questions parameter must be provided (even if it is empty).",
+  "message": "422 Unprocessable Entity: The previous_questions parameter must be a list (even if it is empty).",
+  "message": "422 Unprocessable Entity: A quiz_category parameter must be provided (set 'id':0 to specify any category).",
+  "message": "422 Unprocessable Entity: A quiz_category['id'] parameter must be provided (set 'id':0 to specify any category).",
+  "message": "422 Unprocessable Entity: Unexpected error accessing the database.",
+```
 
 REVIEW_COMMENT
 ```
