@@ -111,7 +111,7 @@ You should feel free to specify endpoints in your own way; if you do so, make su
 5. [PUT    '/questions'](#put-questions)] An endpoint that PUTs a new question into the database, which will require the question and answer text, category, and difficulty score. 
 6. [POST   '/questions'](#post-questionspageintpagerequired)] A POST endpoint that gets questions based on a search term. It returns any questions for whom the search term is a substring of the question. 
 7. [GET    '/categories/<category_id>/questions'](#get-categoriesintcategory_idquestionspageintpagerequired) A GET endpoint that gets questions based on category_id. 
-8. [POST   '/quizzes'](#post-quizes) A POST endpoint that gets questions to play the quiz. This endpoint takea category and previous question parameters and returns a random questions within the given category, if provided, and that is not one of the previous questions. 
+8. [POST   '/quizzes'](#post-quizzes) A POST endpoint that gets questions to play the quiz. This endpoint takea category and previous question parameters and returns a random questions within the given category, if provided, and that is not one of the previous questions. 
 
 ## Testing the API
 The unitest library has been used to create one or more tests for each endpoint to test for expected success and error behaviour.
